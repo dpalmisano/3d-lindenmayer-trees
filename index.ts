@@ -1,13 +1,13 @@
-const { State, Turtle } = require('./turtle3d/turtle')
-const { Puppeteer } = require('./turtle3d/puppeteer')
-const { MeshAssembler, Scene } = require('./turtle3d/meshAssembler')
-const { Controller } = require('./turtle3d/controller')
+import { State, Turtle } from './turtle3d/turtle';  
+import { Puppeteer } from './turtle3d/puppeteer';
+import { MeshAssembler, Scene } from './turtle3d/meshAssembler';
+import { Controller } from './turtle3d/controller';
 
-function toRadiants(angle) {
+function toRadiants(angle: number) {
     return angle * Math.PI / 180
 }
 
-export function turtle3d(generativeString, element, angleDegrees) {
+export function turtle3d(generativeString: string, element: HTMLElement, angleDegrees: number) {
     const angle = toRadiants(angleDegrees);
     const state = State.build(angle);
     const turtle = new Turtle(state);

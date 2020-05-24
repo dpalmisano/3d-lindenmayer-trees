@@ -1,21 +1,29 @@
 const path = require('path');
 
 module.exports = {
-  entry: './index.js',
+  entry: './index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'turtle3d.js',
+    filename: 'bundle.js',
     library: 'turtle3d'
   },
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        exclude: /(node_modules|bower_components)/,
+        use: 'ts-loader',
+      },
+      {
         test: /\.js$/,
-         exclude: /(node_modules|bower_components)/,
+        exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader'
         }
       }
     ]
+  },
+  resolve: {
+     extensions: [ '.tsx', '.ts', '.js' ],
   }
 };
