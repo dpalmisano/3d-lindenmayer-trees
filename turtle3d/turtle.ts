@@ -56,7 +56,11 @@ export class State {
     angle: number;
     position: Vector3;
     quaternion: Quaternion;
-    quaternions: Quaternions;
+    quaternions: Quaternions = {
+        yaw: {},
+        roll: {},
+        pitch: {}
+    }
 
     constructor(angle: number, position: Vector3, quaternion: Quaternion, quaternions?: Quaternions) {
         this.armed = false;
