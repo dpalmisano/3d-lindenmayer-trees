@@ -3,7 +3,7 @@ import { Puppeteer } from './turtle3d/puppeteer';
 import { MeshAssembler, Scene } from './turtle3d/meshAssembler';
 import { Controller } from './turtle3d/controller';
 
-function toRadiants(angle: number) {
+function toRadiants(angle: number): number {
     return angle * Math.PI / 180
 }
 
