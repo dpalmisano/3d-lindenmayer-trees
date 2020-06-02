@@ -1,12 +1,32 @@
-const THREE = require('three');
+import * as THREE from 'three';
 
-function buildQuaternion(axis, angle) {
+import type { Vector3, Quaternion } from 'three';
+
+interface Quaternions { 
+    [index: string]: {
+        [index: string]: Quaternion
+    },
+    'yaw'?: {
+        RIGHT?: Quaternion,
+        LEFT?: Quaternion
+    },
+    'roll'?: {
+        RIGHT?: Quaternion,
+        LEFT?: Quaternion
+    },
+    'pitch'?: {
+        UP?: Quaternion,
+        DOWN?: Quaternion
+    }
+}
+
+function buildQuaternion(axis: Vector3, angle: number): Quaternion {
     const quaternion = new THREE.Quaternion();
     quaternion.setFromAxisAngle(axis, angle);
     return quaternion;
 }
 
-class State {
+export class State {
 
     static axes = {
         X: new THREE.Vector3(1, 0, 0),
@@ -14,7 +34,7 @@ class State {
         Z: new THREE.Vector3(0, 0, 1),
     }
 
-    static build(angle) {
+    static build(angle: number): State {
         return new State(
             angle,
             new THREE.Vector3(0, 0, 0),
@@ -22,7 +42,7 @@ class State {
         )
     }
 
-    static copy(otherState) {
+    static copy(otherState: State): State {
         var state = new State(
             otherState.angle,
             otherState.getPosition(),
@@ -32,13 +52,17 @@ class State {
         return state;
     }
 
-    quaternions = {
-        'yaw': {},
-        'roll': {},
-        'pitch': {}
+    armed: boolean;
+    angle: number;
+    position: Vector3;
+    quaternion: Quaternion;
+    quaternions: Quaternions = {
+        yaw: {},
+        roll: {},
+        pitch: {}
     }
 
-    constructor(angle, position, quaternion, quaternions) {
+    constructor(angle: number, position: Vector3, quaternion: Quaternion, quaternions?: Quaternions) {
         this.armed = false;
         this.angle = angle;
         this.position = position.clone();
@@ -50,7 +74,7 @@ class State {
         }
     }
 
-    initQuaternions() {
+    initQuaternions(): void {
         this.quaternions.yaw.RIGHT = buildQuaternion(State.axes.Z, this.angle);
         this.quaternions.yaw.LEFT = buildQuaternion(State.axes.Z, -this.angle);
         this.quaternions.roll.RIGHT = buildQuaternion(State.axes.Y, this.angle);
@@ -59,9 +83,9 @@ class State {
         this.quaternions.pitch.DOWN = buildQuaternion(State.axes.X, -this.angle);
     }
 
-    getQuaternions() {
-        var result = {}
-        Object.keys(this.quaternions).forEach(actionKey => {
+    getQuaternions(): Quaternions {
+        var result: Quaternions = {};
+        Object.keys(this.quaternions).forEach((actionKey: string) => {
             result[actionKey] = {}
             Object.keys(this.quaternions[actionKey]).forEach(
                 direction => result[actionKey][direction] = this.quaternions[actionKey][direction].clone()
@@ -70,49 +94,61 @@ class State {
         return result;
     }
 
-    getQuaternion() {
+    getQuaternion(): Quaternion {
         return this.quaternion.clone();
     }
 
-    update(op, direction) {
+    update(op: string, direction: string): void {
         const q = this.quaternions[op][direction]
         this.quaternion.multiply(q)
     }
 
-    advance() {
+    advance(): void {
         this.position = this.position.add(this.getDirectionVector());
     }
 
-    getDirectionVector() {
+    getDirectionVector(): Vector3 {
         var v = new THREE.Vector3(0, 1, 0);
 		return v.applyQuaternion(this.quaternion);
     }
 
-    getPosition() {
+    getPosition(): Vector3 {
         return this.position.clone()
     }
 
-    setArmed(armed) {
+    setArmed(armed: boolean): void {
         this.armed = armed;
     }
 
-    isArmed() {
+    isArmed(): boolean {
         return this.armed;
     }
 
 }
 
-class Turtle {
+interface BoundingBox {
+    [index: string]: { [index: string]: number }
+    x: { min: number, max: number },
+    y: { min: number, max: number },
+    z: { min: number, max: number },
+}
 
-    boundingBox = {
+export class Turtle {
+
+    boundingBox: BoundingBox = {
         x: { min: 0, max: 0 },
         y: { min: 0, max: 0 },
         z: { min: 0, max: 0 }
     }
 
+    state: State;
+    edges: Array<Array<Vector3>>;
+    states: Array<State>;
+    workingEdges: Array<Array<Vector3>>;
+    center: Vector3;
+    radius: number;
 
-
-    constructor(state) {
+    constructor(state: State) {
         this.state = state;
         this.edges = [];
         this.states = [];
@@ -121,16 +157,16 @@ class Turtle {
         this.radius = null;
     }
 
-    yaw(direction) {
+    yaw(direction: string) {
         this.state.update('yaw', direction)
         this.state.setArmed(false)
     }
 
-    roll(direction) {
+    roll(direction: string) {
         this.state.update('roll', direction)
     }
 
-    pitch(direction) {
+    pitch(direction: string) {
         this.state.update('pitch', direction)
         this.state.setArmed(false)
     }
@@ -144,7 +180,7 @@ class Turtle {
 
     unstack() {
         this.state = this.states.pop();
-        var edge = this.workingEdges.pop();
+        var edge: Array<Vector3> = this.workingEdges.pop();
         if(edge.length > 1)
             this.edges.push(edge);
     }
@@ -173,7 +209,7 @@ class Turtle {
 
     }
 
-    updateCenter() {
+    updateCenter(): void {
         var xRange = this.boundingBox.x.max - this.boundingBox.x.min;
 		var yRange = this.boundingBox.y.max - this.boundingBox.y.min;
 		var zRange = this.boundingBox.z.max - this.boundingBox.z.min;
@@ -185,7 +221,7 @@ class Turtle {
         );
     }
 
-    updateRadius() {
+    updateRadius(): void {
         var xRange = this.boundingBox.x.max - this.boundingBox.x.min;
 		var yRange = this.boundingBox.y.max - this.boundingBox.y.min;
         var zRange = this.boundingBox.z.max - this.boundingBox.z.min;
@@ -193,31 +229,29 @@ class Turtle {
         this.radius = new THREE.Vector3(xRange, yRange, zRange).length() / 2;
     }
 
-    getEdges() {
+    getEdges(): Array<Array<Vector3>> {
         this.edges.push(this.workingEdges.pop());
         return this.edges.map(p => p && p.map(v => v.clone()))
     }
 
-    updateMin(coord, position) {
+    updateMin(coord: 'x' | 'y' | 'z', position: Vector3): void {
         if(position[coord] < this.boundingBox[coord].min) {
             this.boundingBox[coord].min = position[coord]
         }
     }
 
-    updateMax(coord, position) {
+    updateMax(coord: 'x' | 'y' | 'z', position: Vector3): void {
         if(position[coord] > this.boundingBox[coord].max) {
             this.boundingBox[coord].max = position[coord]
         }
     }
 
-    getCenter() {
+    getCenter(): Vector3 {
         return this.center;
     }
 
-    getRadius() {
+    getRadius(): number {
         return this.radius;
     }
 
 }
-
-module.exports = { State, Turtle }

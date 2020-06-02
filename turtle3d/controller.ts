@@ -1,6 +1,16 @@
-class Controller {
+import { Scene } from './meshAssembler';
 
-    constructor(scene, element) {
+export class Controller {
+    scene: Scene;
+    element: HTMLElement;
+    canvasRect: DOMRect;
+    dragging: {
+        isDragging: boolean,
+        x?: number,
+        y?: number
+    }
+
+    constructor(scene: Scene, element: HTMLElement) {
         this.scene = scene;
         this.element = element;
         this.canvasRect = element.getBoundingClientRect();
@@ -18,11 +28,11 @@ class Controller {
         this.element.addEventListener("wheel", this.mouseScroll.bind(this));
     }
 
-    mouseDown(event) {
+    mouseDown(event: MouseEvent) {
         this.startDragging(event.x - this.canvasRect.left, event.y - this.canvasRect.top);
     }
 
-    mouseMove(event) {
+    mouseMove(event: MouseEvent) {
         this.drag(event.x - this.canvasRect.left, event.y - this.canvasRect.top)
     }
 
@@ -30,7 +40,7 @@ class Controller {
         this.stopDragging();
     }
 
-    mouseScroll(event) {
+    mouseScroll(event: MouseWheelEvent) {
         event.preventDefault();
         const { deltaY } = event;
         if(deltaY < 0) {
@@ -40,7 +50,7 @@ class Controller {
         }
     }
 
-    startDragging(x, y) {
+    startDragging(x: number, y: number) {
         this.dragging = {
             isDragging: true,
             x: x,
@@ -52,7 +62,7 @@ class Controller {
         this.dragging.isDragging = false;
     }
 
-    drag(x, y) {
+    drag(x: number, y: number) {
         const { isDragging } = this.dragging;
         if(isDragging) {
             var deltaX = x - this.dragging.x;
@@ -65,5 +75,3 @@ class Controller {
 		}
     }
 }
-
-module.exports = { Controller }

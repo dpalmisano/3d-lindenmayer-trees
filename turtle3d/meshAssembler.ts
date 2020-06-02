@@ -1,8 +1,15 @@
-const THREE = require('three');
+import * as THREE from 'three';
 
-class MeshAssembler {
+import { Model } from './puppeteer'
 
-    constructor(tubePrecision, tubeRadius) {
+export class MeshAssembler {
+    tubePrecision: number;
+    tubeRadius: number;
+    geometry: THREE.Geometry;
+    fabric: THREE.MeshPhongMaterial;
+    terminal: THREE.SphereGeometry;
+
+    constructor(tubePrecision: number, tubeRadius: number) {
         this.tubePrecision = tubePrecision;
         this.tubeRadius = tubeRadius;
         this.geometry = new THREE.Geometry();
@@ -15,7 +22,7 @@ class MeshAssembler {
 		})
     }
 
-    processEdge(edge) {
+    processEdge(edge: Array<THREE.Vector3>) {
         if(edge.length <= 1) {
             return;
         }
@@ -32,20 +39,36 @@ class MeshAssembler {
 		tube.dispose();
     }
 
-    getMesh(edges) {
+    getMesh(edges: Array<Array<THREE.Vector3>>): THREE.Mesh {
         edges.forEach(edge => this.processEdge(edge));
         return new THREE.Mesh(this.geometry, this.fabric);
     }
 
     getRadius() {
-        return this.geometry.getRadius();
+        return this.geometry.boundingSphere.radius;
     }
 
 }
 
-class Scene {
+interface CameraSettings {
+    rotation: number,
+    pitch: number,
+    zoom: number,
+    center: THREE.Vector3,
+    radius: number,
+    speed: number
+}
 
-    constructor(model, element) {
+export class Scene {
+    mesh: THREE.Mesh;
+    center: THREE.Vector3;
+    threeScene: THREE.Scene;
+    engine: THREE.WebGLRenderer;
+    camera: THREE.PerspectiveCamera;
+
+    cameraSettings: CameraSettings;
+    
+    constructor(model: Model, element: HTMLElement) {
         const { mesh, center, radius } = model;
         this.mesh = mesh;
         this.center = center;
@@ -66,20 +89,21 @@ class Scene {
         this.initCamera(radius);
     }
 
-    initCamera(radius) {
+    initCamera(radius: number) {
         this.camera = new THREE.PerspectiveCamera(
 			70,
 			400 / 400,
 			0.1,
             10000
         );
-        this.cameraSettings = {};
-        this.cameraSettings.rotation = Math.PI / 4;
-		this.cameraSettings.pitch = Math.PI / 2;
-		this.cameraSettings.zoom = 1.7;
-        this.cameraSettings.center = this.center;
-        this.cameraSettings.radius = radius;
-        this.cameraSettings.speed = 0.01;
+        this.cameraSettings = {
+            rotation: Math.PI / 4,
+            pitch: Math.PI / 2,
+            zoom: 1.7,
+            center: this.center,
+            radius: radius,
+            speed: 0.01
+        };
     }
 
     shoot() {
@@ -90,7 +114,7 @@ class Scene {
         this.camera.lookAt(this.cameraSettings.center.x, this.cameraSettings.center.y, this.cameraSettings.center.z);
     }
 
-    moveCamera(x, y) {
+    moveCamera(x: number, y: number) {
         this.cameraSettings.rotation += x * this.cameraSettings.speed;
         this.cameraSettings.pitch -= y * this.cameraSettings.speed;
         this.render();
@@ -120,5 +144,3 @@ class Scene {
     }
 
 }
-
-module.exports = { MeshAssembler, Scene }

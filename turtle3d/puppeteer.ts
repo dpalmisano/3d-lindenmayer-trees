@@ -1,14 +1,26 @@
+import { Turtle } from './turtle';
+import { MeshAssembler } from './meshAssembler';
 
+import { Vector3 } from 'three';
 
-class Puppeteer {
+export interface Model {
+    mesh: THREE.Mesh,
+    center: Vector3,
+    radius: number
+}
 
-    constructor(symbols, turtle, meshAssembler) {
+export class Puppeteer {
+    symbols: Array<string>;
+    turtle: Turtle;
+    meshAssembler: MeshAssembler;
+
+    constructor(symbols: Array<string>, turtle: Turtle, meshAssembler: MeshAssembler) {
         this.symbols = symbols
         this.turtle = turtle
         this.meshAssembler = meshAssembler
     }
 
-    processSymbol(symbol) {
+    processSymbol(symbol: string) {
         switch(symbol) {
             case "[":
                 this.turtle.stack();
@@ -40,7 +52,7 @@ class Puppeteer {
         }
     }
 
-    play() {
+    play(): Model {
         this.symbols.forEach(symbol => {
             this.processSymbol(symbol)
         });
@@ -54,5 +66,3 @@ class Puppeteer {
 
 
 }
-
-module.exports = { Puppeteer }
