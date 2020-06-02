@@ -7,7 +7,7 @@ function toRadiants(angle: number): number {
     return angle * Math.PI / 180
 }
 
-export function turtle3d(generativeString: string, element: HTMLElement, angleDegrees: number) {
+export function turtle3d(generativeString: string, element: HTMLElement, angleDegrees: number): Controller  {
     const angle = toRadiants(angleDegrees);
     const state = State.build(angle);
     const turtle = new Turtle(state);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import type { Vector3, Quaternion, Vector } from 'three';
+import type { Vector3, Quaternion } from 'three';
 
 interface Quaternions { 
     [index: string]: {
