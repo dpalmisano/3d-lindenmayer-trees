@@ -1,13 +1,15 @@
-const assert = require('assert');
-const sinon = require('sinon');
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 
-const THREE = require('three')
+import * as THREE from 'three';
 
-var { State, Turtle } = require('../turtle3d/turtle.js')
+import { State, Turtle } from '../turtle3d/turtle';
 
 const angle = 45;
 
 describe('State', () => {
+
+  var state: State;
 
   beforeEach(() => {
     state = State.build(angle);

@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "es6",
+    "noImplicitAny": false,
+    "module": "commonjs",
     "target": "es5",
     "jsx": "react",
     "declaration": true,
     "moduleResolution": "node",
     "allowJs": true
-  }
+  },
 }

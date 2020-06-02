@@ -1,9 +1,10 @@
-const assert = require('assert');
-const sinon = require('sinon');
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 
-const THREE = require('three');
+import * as THREE from 'three';
 
-var { MeshAssembler, Scene } = require('../turtle3d/meshAssembler.js');
+import { Model } from '../turtle3d/puppeteer';
+import { MeshAssembler, Scene } from '../turtle3d/meshAssembler';
 
 describe('MeshAssembler', () => {
 
@@ -26,11 +27,7 @@ describe('MeshAssembler', () => {
 describe('Scene', () => {
 
   const initialRadius = 0.5;
-  const initialCenter = {
-    x: 0,
-    y: 0,
-    z: 0
-  }
+  const initialCenter = new THREE.Vector3(0, 0,0 );
   var scene;
 
   var setSizeSpy;
@@ -38,6 +35,7 @@ describe('Scene', () => {
 
   var lookAtSpy;
   var engineRenderSpy;
+  var appendChildSpy;
 
   beforeEach(() => {
     setSizeSpy = sinon.spy();
@@ -49,9 +47,8 @@ describe('Scene', () => {
     }
 
     appendChildSpy = sinon.spy();
-    const elementMock = {
-      appendChild: appendChildSpy,
-    }
+    const elementMock: HTMLElement = <HTMLElement> <any> sinon.mock(HTMLElement);
+    elementMock.appendChild = appendChildSpy;
 
     lookAtSpy = sinon.spy();
     const cameraMock = {
@@ -65,7 +62,14 @@ describe('Scene', () => {
 
     sinon.stub(THREE, 'WebGLRenderer').returns(engineMock);
     sinon.stub(THREE, 'PerspectiveCamera').returns(cameraMock);
-    scene = new Scene({ mesh: {}, center: initialCenter, radius: initialRadius }, elementMock);
+
+    const modelMock: Model = {
+      mesh: <THREE.Mesh> <any> sinon.mock(THREE.Mesh),
+      center: initialCenter,
+      radius: initialRadius
+    }
+
+    scene = new Scene(modelMock, elementMock);
   });
 
   afterEach(function () {

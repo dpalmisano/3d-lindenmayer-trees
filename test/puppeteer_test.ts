@@ -1,13 +1,11 @@
-const assert = require('assert');
-const sinon = require('sinon');
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 
-var { State, Turtle } = require('../turtle3d/turtle.js')
+import * as THREE from 'three';
 
-
-const THREE = require('three')
-
-var { Puppeteer } = require('../turtle3d/puppeteer.js')
-
+import { State, Turtle } from '../turtle3d/turtle';
+import { Puppeteer } from '../turtle3d/puppeteer';
+import { MeshAssembler } from '../turtle3d/meshAssembler';
 
 describe('Puppeteer play', () => {
 
@@ -15,7 +13,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const stackSpy = sinon.spy(turtle, 'stack' );
-    const puppeteer = new Puppeteer(['['], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['['], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -25,8 +27,12 @@ describe('Puppeteer play', () => {
   it('with symbol ] should call turtle unstack', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
-    const unstackSpy = sinon.spy(turtle, 'unstack' );
-    const puppeteer = new Puppeteer([']'], turtle, { 'getMesh': () => {}});
+    const unstackSpy = sinon.spy(turtle, 'unstack');
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer([']'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -37,7 +43,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const yawSpy = sinon.spy(turtle, 'yaw');
-    const puppeteer = new Puppeteer(['+'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['+'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -48,7 +58,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const yawSpy = sinon.spy(turtle, 'yaw');
-    const puppeteer = new Puppeteer(['-'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['-'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -59,7 +73,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const rollSpy = sinon.spy(turtle, 'roll');
-    const puppeteer = new Puppeteer(['/'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['/'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -70,7 +88,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const rollSpy = sinon.spy(turtle, 'roll');
-    const puppeteer = new Puppeteer(['\\'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['\\'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -81,7 +103,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const pitchSpy = sinon.spy(turtle, 'pitch');
-    const puppeteer = new Puppeteer(['^'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['^'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -92,7 +118,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const pitchSpy = sinon.spy(turtle, 'pitch');
-    const puppeteer = new Puppeteer(['_'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['_'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -103,7 +133,11 @@ describe('Puppeteer play', () => {
     const state = State.build(0);
     const turtle = new Turtle(state);
     const drawSpy = sinon.spy(turtle, 'draw');
-    const puppeteer = new Puppeteer(['A'], turtle, { 'getMesh': () => {}});
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = sinon.spy();
+
+    const puppeteer = new Puppeteer(['A'], turtle, meshAssemblerMock);
 
     puppeteer.play()
 
@@ -117,7 +151,11 @@ describe('Puppeteer play', () => {
 
 
     const testMesh = new THREE.Mesh();
-    const puppeteer = new Puppeteer(['A'], turtle, { 'getMesh': () => testMesh } );
+
+    const meshAssemblerMock = <MeshAssembler> <any> sinon.mock(MeshAssembler);
+    meshAssemblerMock.getMesh = () => testMesh
+
+    const puppeteer = new Puppeteer(['A'], turtle, meshAssemblerMock);
 
     const { mesh, center } = puppeteer.play();
     assert.equal(mesh.type, 'Mesh');
